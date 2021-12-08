@@ -34,12 +34,35 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+          exit 1
   slackNotification:
-    name: Slack Notification
+    needs: build
+    name: send Slack success/failure notification
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@v2
+      # set the workflow status to env.WORKFLOW_CONCLUSION
+    - name: get the entire workflow status
+      uses: technote-space/workflow-conclusion-action@v1
+
+    - name: slack notify success
+      if: env.WORKFLOW_CONCLUSION == 'success'
+      uses: rtCamp/action-slack-notify@master
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_USERNAME: tetrate-ci
+        SLACK_COLOR: good
+        SLACK_TITLE: "Deployment pipeline run successful :tada:"
+        SLACK_FOOTER: ""
+        SLACK_ICON: https://ca.slack-edge.com/TB9P88K1N-UT5R2D4E6-ae3e744e83dd-72
+    - name: slack notify failure
+      # GHA doesn't have `else`
+      if: env.WORKFLOW_CONCLUSION != 'success'
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_USERNAME: tetrate-ci
+        SLACK_COLOR: danger
+        SLACK_TITLE: "Deployment pipeline run failed :fire:"
+        SLACK_FOOTER: ""
+        SLACK_ICON: https://ca.slack-edge.com/TB9P88K1N-UT5R2D4E6-ae3e744e83dd-72
+        
