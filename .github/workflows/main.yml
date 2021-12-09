@@ -34,7 +34,7 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
-          exit 0
+          exit 1
   slackNotification:
     needs: build
     name: send Slack success/failure notification
