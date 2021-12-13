@@ -39,6 +39,7 @@ jobs:
     needs: build
     name: send Slack success/failure notification
     runs-on: ubuntu-latest
+    if: always()
     steps:
       # set the workflow status to env.WORKFLOW_CONCLUSION
     - name: get the entire workflow status
